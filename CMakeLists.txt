@@ -76,7 +76,7 @@ file(GLOB AWS_CRT_SRC
        "source/*.c"
 )
 
-add_library(${PROJECT_NAME} SHARED ${AWS_CRT_SRC})
+add_library(${PROJECT_NAME} SHARED ${AWS_CRT_SRC} ${CMAKE_JS_SRC})
 aws_set_common_properties(${PROJECT_NAME})
 aws_prepare_symbol_visibility_args(${PROJECT_NAME} "AWS_CRT_NODEJS")
 aws_add_sanitizers(${PROJECT_NAME})
@@ -90,11 +90,13 @@ target_include_directories(${PROJECT_NAME} PRIVATE
         $<INSTALL_INTERFACE:include>
         ${CMAKE_JS_INC})
 
+add_definitions(-V8_COMPRESS_POINTERS, -V8_31BIT_SMIS_ON_64BIT_ARCH, -V8_REVERSE_JSARGS, -V8_COMPRESS_POINTERS_IN_ISOLATE_CAGE)
+
 aws_use_package(aws-c-http REQUIRED)
 aws_use_package(aws-c-mqtt REQUIRED)
 aws_use_package(aws-c-auth REQUIRED)
 aws_use_package(aws-checksums REQUIRED)
-target_link_libraries(${PROJECT_NAME} PRIVATE ${CMAKE_JS_LIB} ${DEP_AWS_LIBS})
+target_link_libraries(${PROJECT_NAME} ${CMAKE_JS_LIB} ${DEP_AWS_LIBS})
 
 if (CMAKE_JS_PLATFORM AND CMAKE_JS_ARCH)
     # When run from build.ts, these are set
